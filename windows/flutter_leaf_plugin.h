@@ -6,7 +6,34 @@
 
 #include <memory>
 
+#include <flutter/event_channel.h>
+#include <flutter/event_sink.h>
+#include <flutter/event_stream_handler_functions.h>
+
 namespace flutter_leaf {
+
+enum class VpnState {
+  disconnected,
+  connecting,
+  connected,
+  disconnecting, 
+  error
+};
+
+class LeafStateStreamHandler : public flutter::StreamHandler<flutter::EncodableValue> {
+public:
+  void StateChanged(VpnState v);
+  VpnState vpnState;
+protected:
+  std::unique_ptr<flutter::StreamHandlerError<flutter::EncodableValue>> OnListenInternal(
+    const flutter::EncodableValue* arguments,
+    std::unique_ptr<flutter::EventSink<flutter::EncodableValue>>&& events) override;
+
+  virtual std::unique_ptr<flutter::StreamHandlerError<flutter::EncodableValue>> OnCancelInternal(
+    const flutter::EncodableValue* arguments) override;
+private:
+  std::unique_ptr<flutter::EventSink<>> event_sink_;
+};
 
 class FlutterLeafPlugin : public flutter::Plugin {
  public:
