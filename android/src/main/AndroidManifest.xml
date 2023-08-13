@@ -1,0 +1,16 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  package="club.lemos.flutter_leaf">
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <application>
+        <service
+            android:name="club.lemos.vpn.logic.VpnStateService"
+            android:exported="false" />
+        <service
+            android:name="club.lemos.vpn.logic.LeafVpnService"
+            android:permission="android.permission.BIND_VPN_SERVICE" />
+    </application>
+</manifest>
