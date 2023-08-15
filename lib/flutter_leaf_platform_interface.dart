@@ -52,7 +52,7 @@ abstract class FlutterLeafPlatform extends PlatformInterface {
   /// This will create a background VPN service.
   /// MTU is only available on android.
   Future<void> connect({
-    required String proxy,
+    required String configContent,
     int? mtu,
     String? allowedApps,
     String? disallowedApps,
@@ -61,7 +61,7 @@ abstract class FlutterLeafPlatform extends PlatformInterface {
 
   /// Switch VPN service's proxy.
   Future<void> switchProxy({
-    required String proxy,
+    required String configContent,
   }) async =>
       throw UnimplementedError();
 }

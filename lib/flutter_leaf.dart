@@ -31,13 +31,13 @@ class FlutterLeaf {
   /// This will create a background VPN service.
   /// MTU is only available on android.
   static Future<void> connect({
-    required String proxy,
+    required String configContent,
     int? mtu,
     String? allowedApps,
     String? disallowedApps,
   }) =>
       FlutterLeafPlatform.instance.connect(
-        proxy: proxy,
+        configContent: configContent,
         mtu: mtu,
         allowedApps: allowedApps,
         disallowedApps: disallowedApps,
@@ -45,9 +45,9 @@ class FlutterLeaf {
 
   /// Switch VPN service's proxy.
   static Future<void> switchProxy({
-    required String proxy,
+    required String configContent,
   }) =>
       FlutterLeafPlatform.instance.switchProxy(
-        proxy: proxy,
+        configContent: configContent,
       );
 }

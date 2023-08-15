@@ -5,7 +5,7 @@ import java.util.UUID;
 public class VpnProfile {
 
     private UUID mUUID;
-    private String proxy;
+    private String configContent;
 
     private Integer mMTU;
 
@@ -21,12 +21,12 @@ public class VpnProfile {
         return mUUID;
     }
 
-    public String getProxy() {
-        return proxy;
+    public String getConfigContent() {
+        return configContent;
     }
 
-    public void setProxy(String proxy) {
-        this.proxy = proxy;
+    public void setConfigContent(String configContent) {
+        this.configContent = configContent;
     }
 
     public Integer getMTU() {

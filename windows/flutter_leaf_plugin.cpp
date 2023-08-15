@@ -26,41 +26,30 @@ namespace flutter_leaf {
   //配置文件名称
   const char* config_file_name = "config.conf";
 
-  //配置模板内容
-  std::string config_file_template = "[General]\n" \
-    "dns-server = 223.5.5.5\n" \
-    "tun = auto\n" \
-    "loglevel = debug\n" \
-    "[Proxy]\n" \
-    "Direct = direct\n" \
-    "SOCKS5 = socks,192.168.1.14,1080\n" \
-    "[Rule]\n" \
-    "FINAL, SOCKS5\n";
-
   //加载配置文件
-  fs::path create_config_file(const char* file_name) {
+  fs::path load_config_file(std::string configContent) {
     fs::path exePath = fs::current_path();
     fs::path configFilePath = exePath / config_file_name;
-    if (!fs::exists(configFilePath)) {
-      std::ofstream configFile(configFilePath);
-      if (configFile.is_open()) {
-        configFile << config_file_template;
-        configFile.close();
-        std::cout << "Created and wrote default configuration to: " << configFilePath << std::endl;
-      }
-      else {
-        std::cerr << "Error: Unable to create config file." << std::endl;
-      }
+    std::ofstream ofs(configFilePath);
+    if (ofs.is_open()) {
+      ofs << configContent;
+      ofs.close();
     }
     else {
-      std::cout << "Config file already exists: " << configFilePath << std::endl;
+      std::cerr << "failed to load file " << config_file_name << std::endl;
     }
     return configFilePath;
   }
 
-  void start_leaf() {
-    auto config_path = create_config_file(config_file_name);
+  void start_leaf(std::string configContent) {
+    auto config_path = load_config_file(configContent);
     int i = leaf_run(1, config_path.string().c_str());
+    std::cout << "leaf_run return value:" << i << std::endl;
+  }
+
+  void reload_leaf(std::string configContent) {
+    load_config_file(configContent);
+    int i = leaf_reload(1);
     std::cout << "leaf_run return value:" << i << std::endl;
   }
 
@@ -133,13 +122,18 @@ namespace flutter_leaf {
       result->Success(flutter::EncodableValue(true));
     }
     else if (method_call.method_name().compare("switchProxy") == 0) {
+      auto* arguments = std::get_if<flutter::EncodableMap>(method_call.arguments());
+      auto configContent = std::get<std::string>(arguments->at(flutter::EncodableValue("configContent")));
+      reload_leaf(configContent);
       result->Success(flutter::EncodableValue(true));
     }
     else if (method_call.method_name().compare("connect") == 0) {
+      auto* arguments = std::get_if<flutter::EncodableMap>(method_call.arguments());
+      auto configContent = std::get<std::string>(arguments->at(flutter::EncodableValue("configContent")));
       //变更状态
       stream_handler_->StateChanged(VpnState::connecting);
       //启动线程
-      connection_handler_ = std::thread(start_leaf);
+      connection_handler_ = std::thread(start_leaf, configContent);
       connection_handler_.detach();
       //变更状态
       stream_handler_->StateChanged(VpnState::connected);

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_leaf/flutter_leaf.dart';
 import 'package:flutter_leaf/state.dart';
@@ -16,13 +18,40 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   late FlutterLeafState state = FlutterLeafState.disconnected;
 
-  final _proxyController =
-      TextEditingController(text: "socks://lisi:abc123@192.168.1.9:7890");
+  late TextEditingController _configContentController;
 
   @override
   void initState() {
     super.initState();
+    loadConfigContent();
     initLeaf();
+  }
+
+  void loadConfigContent() {
+    String configContent;
+    if (Platform.isAndroid) {
+      configContent = """[General]
+      dns-server = 223.5.5.5
+      tun-fd = <TUN-FD>
+      loglevel = info
+      [Proxy]
+      Direct = direct
+      SOCKS5 = socks,192.168.1.9,7890
+      [Rule]
+      FINAL, SOCKS5""";
+    } else {
+      configContent = """[General]
+      dns-server = 223.5.5.5
+      tun = auto
+      loglevel = info
+      [Proxy]
+      Direct = direct
+      SOCKS5 = socks,192.168.1.14,1080
+      [Rule]
+      FINAL, SOCKS5""";
+    }
+    final content = configContent.trim().replaceAll(RegExp(r' \s+'), ' ');
+    _configContentController = TextEditingController(text: content);
   }
 
   void initLeaf() async {
@@ -47,9 +76,7 @@ class _MyAppState extends State<MyApp> {
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
             ),
-            TextFormField(
-              controller: _proxyController,
-            ),
+            TextField(controller: _configContentController, maxLines: null),
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -57,7 +84,8 @@ class _MyAppState extends State<MyApp> {
                 state == FlutterLeafState.disconnected
                     ? ElevatedButton(
                         onPressed: () {
-                          FlutterLeaf.connect(proxy: _proxyController.text);
+                          FlutterLeaf.connect(
+                              configContent: _configContentController.text);
                         },
                         child: const Text('Connect'),
                       )
@@ -71,7 +99,8 @@ class _MyAppState extends State<MyApp> {
                   onPressed: state != FlutterLeafState.connected
                       ? null
                       : () {
-                          FlutterLeaf.switchProxy(proxy: _proxyController.text);
+                          FlutterLeaf.switchProxy(
+                              configContent: _configContentController.text);
                         },
                   child: const Text('Switch'),
                 ),

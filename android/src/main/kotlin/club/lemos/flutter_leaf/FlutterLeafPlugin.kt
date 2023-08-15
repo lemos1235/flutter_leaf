@@ -110,13 +110,11 @@ class FlutterLeafPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
           result.success(false)
           return
         }
-
         val args = call.arguments as Map<*, *>
-
         val profileInfo = Bundle()
-        profileInfo.putString("PROXY", args["proxy"] as String)
+        profileInfo.putString("configContent", args["configContent"] as String)
         if (args.containsKey("mtu")) {
-          profileInfo.putInt("MTU", args["mtu"] as Int)
+          profileInfo.putInt("mtu", args["mtu"] as Int)
         }
         if (args.containsKey("allowedApps")) {
           profileInfo.putString("allowedApps", args["allowedApps"] as String)
@@ -136,7 +134,7 @@ class FlutterLeafPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
       "disconnect" -> vpnStateService?.disconnect()
       "switchProxy" -> {
         val args = call.arguments as Map<*, *>
-        vpnStateService?.switchProxy(args["proxy"] as String)
+        vpnStateService?.switchProxy(args["configContent"] as String)
         result.success(true)
       }
 

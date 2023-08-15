@@ -62,13 +62,13 @@ class MethodChannelFlutterLeaf extends FlutterLeafPlatform {
   /// MTU is only available on android.
   @override
   Future<void> connect({
-    required String proxy,
+    required String configContent,
     int? mtu,
     String? allowedApps,
     String? disallowedApps,
   }) async =>
       await methodChannel.invokeMethod('connect', {
-        'proxy': proxy,
+        'configContent': configContent,
         if (mtu != null) 'mtu': mtu,
         if (allowedApps != null) 'allowedApps': allowedApps,
         if (disallowedApps != null) 'disallowedApps': disallowedApps,
@@ -76,9 +76,9 @@ class MethodChannelFlutterLeaf extends FlutterLeafPlatform {
 
   /// Switch VPN service's proxy.
   @override
-  Future<void> switchProxy({required String proxy}) async {
+  Future<void> switchProxy({required String configContent}) async {
     await methodChannel.invokeMethod('switchProxy', {
-      'proxy': proxy,
+      'configContent': configContent,
     });
   }
 }
