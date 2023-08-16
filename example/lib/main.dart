@@ -43,7 +43,7 @@ class _MyAppState extends State<MyApp> {
       configContent = """[General]
       dns-server = 223.5.5.5
       tun = auto
-      loglevel = info
+      loglevel = debug
       [Proxy]
       Direct = direct
       SOCKS5 = socks,192.168.1.14,1080

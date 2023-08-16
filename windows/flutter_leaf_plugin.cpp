@@ -23,10 +23,10 @@ namespace fs = std::filesystem;
 
 namespace flutter_leaf {
 
-  //ÅäÖÃÎÄ¼şÃû³Æ
+  //é…ç½®æ–‡ä»¶åç§°
   const char* config_file_name = "config.conf";
 
-  //¼ÓÔØÅäÖÃÎÄ¼ş
+  //åŠ è½½é…ç½®æ–‡ä»¶
   fs::path load_config_file(std::string configContent) {
     fs::path exePath = fs::current_path();
     fs::path configFilePath = exePath / config_file_name;
@@ -43,18 +43,19 @@ namespace flutter_leaf {
 
   void start_leaf(std::string configContent) {
     auto config_path = load_config_file(configContent);
-    int i = leaf_run(1, config_path.string().c_str());
+    int i = leaf_run(0, config_path.string().c_str());
     std::cout << "leaf_run return value:" << i << std::endl;
   }
 
   void reload_leaf(std::string configContent) {
     load_config_file(configContent);
-    int i = leaf_reload(1);
-    std::cout << "leaf_run return value:" << i << std::endl;
+    int i = leaf_reload(0);
+    std::cout << "leaf_reload return value:" << i << std::endl;
   }
 
   void stop_leaf() {
-    leaf_shutdown(1);
+    bool i = leaf_shutdown(0);
+    std::cout << "leaf_shutdown return value:" << i << std::endl;
   }
   // static
   void FlutterLeafPlugin::RegisterWithRegistrar(
@@ -97,7 +98,7 @@ namespace flutter_leaf {
 
   FlutterLeafPlugin::~FlutterLeafPlugin() {}
 
-  //´¦Àí²å¼ş·½·¨
+  //å¤„ç†æ’ä»¶æ–¹æ³•
   void FlutterLeafPlugin::HandleMethodCall(
     const flutter::MethodCall<flutter::EncodableValue>& method_call,
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result) {
@@ -112,12 +113,11 @@ namespace flutter_leaf {
       result->Success(flutter::EncodableValue(s));
     }
     else if (method_call.method_name().compare("disconnect") == 0) {
-      //±ä¸ü×´Ì¬
+      //å˜æ›´çŠ¶æ€
       stream_handler_->StateChanged(VpnState::disconnecting);
-      //Í£Ö¹leaf£¬²¢µÈ´ıÏß³Ì½áÊø
+      //Í£åœæ­¢leafï¼Œå¹¶ç­‰å¾…çº¿ç¨‹ç»“æŸ
       stop_leaf();
-      connection_handler_.join();
-      //±ä¸ü×´Ì¬
+      //å˜æ›´çŠ¶æ€
       stream_handler_->StateChanged(VpnState::disconnected);
       result->Success(flutter::EncodableValue(true));
     }
@@ -130,12 +130,12 @@ namespace flutter_leaf {
     else if (method_call.method_name().compare("connect") == 0) {
       auto* arguments = std::get_if<flutter::EncodableMap>(method_call.arguments());
       auto configContent = std::get<std::string>(arguments->at(flutter::EncodableValue("configContent")));
-      //±ä¸ü×´Ì¬
+      //å˜æ›´çŠ¶æ€
       stream_handler_->StateChanged(VpnState::connecting);
-      //Æô¶¯Ïß³Ì
+      //å¯åŠ¨çº¿ç¨‹
       connection_handler_ = std::thread(start_leaf, configContent);
       connection_handler_.detach();
-      //±ä¸ü×´Ì¬
+      //å˜æ›´çŠ¶æ€
       stream_handler_->StateChanged(VpnState::connected);
       result->Success(flutter::EncodableValue(true));
     }
@@ -144,7 +144,7 @@ namespace flutter_leaf {
     }
   }
 
-  //´¦Àí×´Ì¬ÊÂ¼ş
+  //å¤„ç†çŠ¶æ€äº‹ä»¶
   void LeafStateStreamHandler::StateChanged(VpnState v) {
     vpnState = v;
     int s = static_cast<int>(v);
