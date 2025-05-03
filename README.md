@@ -1,15 +1,40 @@
-# flutter_leaf
+# Flutter Leaf
 
-A new flutter vpn plugin based on leaf.
+A Flutter VPN plugin based on [Leaf](https://github.com/eycorsican/leaf).
 
-## Getting Started
+## Installation
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/to/develop-plugins),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+```yaml
+dependencies:
+  flutter_leaf: ^0.0.1
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Usage
+
+```dart
+import 'package:flutter_leaf/flutter_leaf.dart';
+
+// Check VPN permission (only required for Android)
+bool prepared = await FlutterLeaf.prepared;
+if (!prepared) {
+  prepared = await FlutterLeaf.prepare();
+}
+
+// Connect to VPN
+await FlutterLeaf.connect(
+  configContent: yourConfigContent,
+);
+
+// Listen for state changes
+FlutterLeaf.onStateChanged.listen((state) {
+  print('VPN state: $state');
+});
+
+// Disconnect
+await FlutterLeaf.disconnect();
+```
+
+## License
+
+This project is open-sourced under the MIT License.
 

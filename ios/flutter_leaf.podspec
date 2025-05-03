@@ -13,13 +13,27 @@ A new flutter vpn plugin based on leaf.
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Your Company' => 'email@example.com' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
+  s.source_files = 'Classes/**/*', 'Templates/**/*'
+  s.resources = ['Templates/Info.plist', 'Templates/VPNExtension.entitlements']
   s.dependency 'Flutter'
   s.platform = :ios, '12.0'
 
   # Flutter.framework does not contain a i386 slice.
-  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
+  s.pod_target_xcconfig = { 
+    'DEFINES_MODULE' => 'YES', 
+    'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386',
+    'SWIFT_OBJC_BRIDGING_HEADER' => '${PODS_TARGET_SRCROOT}/Classes/Flutter-Leaf-Bridging-Header.h'
+  }
   s.swift_version = '5.0'
+
+  # 添加 NetworkExtension 框架依赖
+  s.framework = 'NetworkExtension'
+  
+  # 添加静态库作为资源
+  s.vendored_libraries = 'Classes/libleaf/libleaf.a'
+  
+  # 添加头文件搜索路径
+  s.xcconfig = { 'HEADER_SEARCH_PATHS' => '${PODS_TARGET_SRCROOT}/Classes/libleaf' }
 
   # If your plugin requires a privacy manifest, for example if it uses any
   # required reason APIs, update the PrivacyInfo.xcprivacy file to describe your
